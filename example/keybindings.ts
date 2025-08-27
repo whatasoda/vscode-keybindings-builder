@@ -18,7 +18,7 @@ const registerZoom = () => {
     .register();
 
   builder
-    .key("cmd+numpad0", "presetDefault")
+    .key("cmd+numpad0", "preserveDefault")
     .command("workbench.action.zoomReset", { when: "editorTextFocus" })
     .register();
 };
