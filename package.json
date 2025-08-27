@@ -1,0 +1,16 @@
+{
+  "name": "vscode-keyboard-builder-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "example"
+  ],
+  "scripts": {},
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.2",
+    "@types/bun": "latest",
+    "typescript": "^5.9.0"
+  }
+}
