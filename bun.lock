@@ -15,11 +15,11 @@
       },
     },
     "example": {
-      "name": "vscode-keyboard-builder-example",
+      "name": "vscode-keybindings-builder-example",
       "version": "0.0.0",
     },
-    "packages/vscode-keyboard-builder": {
-      "name": "vscode-keyboard-builder",
+    "packages/vscode-keybindings-builder": {
+      "name": "vscode-keybindings-builder",
       "version": "0.0.0",
     },
   },
@@ -62,9 +62,9 @@
 
     "undici-types": ["undici-types@7.10.0", "", {}, "sha512-t5Fy/nfn+14LuOc2KNYg75vZqClpAiqscVvMygNnlsHBFpSXdJaYtXMcdNLpl/Qvc3P2cB3s6lOV51nqsFq4ag=="],
 
-    "vscode-keyboard-builder": ["vscode-keyboard-builder@workspace:packages/vscode-keyboard-builder"],
+    "vscode-keybindings-builder": ["vscode-keybindings-builder@workspace:packages/vscode-keybindings-builder"],
 
-    "vscode-keyboard-builder-example": ["vscode-keyboard-builder-example@workspace:example"],
+    "vscode-keybindings-builder-example": ["vscode-keybindings-builder-example@workspace:example"],
 
     "zod": ["zod@4.1.3", "", {}, "sha512-1neef4bMce1hNTrxvHVKxWjKfGDn0oAli3Wy1Uwb7TRO1+wEwoZUZNP1NXIEESybOBiFnBOhI6a4m6tCLE8dog=="],
   }

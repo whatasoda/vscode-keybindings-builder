@@ -1,5 +1,5 @@
 {
-  "name": "vscode-keyboard-builder-example",
+  "name": "vscode-keybindings-builder-example",
   "version": "0.0.0",
   "private": true,
   "type": "module",

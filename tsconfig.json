@@ -5,9 +5,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
-    "jsx": "react-native",
     "allowJs": true,
-    "types": ["react", "node"],
 
     // Bundler mode
     "moduleResolution": "Node",

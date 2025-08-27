@@ -1,4 +1,4 @@
-# vscode-keyboard-builder
+# vscode-keybindings-builder
 
 ## Overview
 
@@ -54,7 +54,7 @@ interface BuildResult {
 ### Usage Example
 
 ```ts
-import { createBuilder } from "vscode-keyboard-builder";
+import { createBuilder } from "vscode-keybindings-builder";
 
 // Initialize builder with configuration
 const builder = createBuilder({
@@ -109,13 +109,13 @@ try {
   const result = await builder.build();
   console.log(`Generated ${result.keybindingsCount} keybindings`);
   console.log(`Output written to: ${result.outputPath}`);
-  
+
   // Display warnings for preserved manual keybindings
   if (result.warnings.length > 0) {
     console.warn("Warnings:");
-    result.warnings.forEach(warning => console.warn(`  - ${warning}`));
+    result.warnings.forEach((warning) => console.warn(`  - ${warning}`));
   }
-  
+
   // Show preserved manual keybindings count
   if (result.preservedCount > 0) {
     console.log(`Preserved ${result.preservedCount} manual keybindings`);
@@ -136,10 +136,12 @@ try {
 When `currentKeybindingPath` is provided:
 
 1. **Conflict Detection**: Build fails if manual keybindings conflict with builder-defined keybindings
+
    - A conflict occurs when the same key combination exists in both manual and builder definitions
    - Error message should clearly indicate which keys are conflicting
 
 2. **Preservation of Manual Entries**: Non-conflicting manual keybindings are preserved
+
    - Keybindings not defined in the builder are carried over to the output
    - Warning is displayed for each preserved manual keybinding
 
@@ -149,6 +151,7 @@ When `currentKeybindingPath` is provided:
    - Proper handling of default keybinding overrides
 
 Example conflict scenario:
+
 ```ts
 // Current keybindings.json has:
 { "key": "cmd+k", "command": "workbench.action.clearConsole" }
@@ -161,6 +164,7 @@ builder.key("cmd+k", "clearDefault").command("editor.action.format")
 ```
 
 Example preservation scenario:
+
 ```ts
 // Current keybindings.json has:
 { "key": "cmd+shift+p", "command": "workbench.action.showCommands" }

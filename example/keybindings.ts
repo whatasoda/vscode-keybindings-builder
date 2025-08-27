@@ -1,4 +1,4 @@
-import { createBuilder } from "vscode-keyboard-builder";
+import { createBuilder } from "vscode-keybindings-builder";
 
 const builder = createBuilder({
   dirname: import.meta.dirname,

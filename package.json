@@ -1,5 +1,5 @@
 {
-  "name": "vscode-keyboard-builder-monorepo",
+  "name": "vscode-keybindings-builder-monorepo",
   "version": "0.0.0",
   "private": true,
   "type": "module",
