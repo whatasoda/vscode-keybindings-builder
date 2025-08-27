@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { generateOverrideDefaultBindings } from "./overrideDefault";
 
 describe("generateOverrideDefaultBindings", () => {
@@ -6,7 +6,7 @@ describe("generateOverrideDefaultBindings", () => {
     const result = generateOverrideDefaultBindings(
       "ctrl+p",
       ["workbench.action.quickOpen"],
-      [{ name: "myCommand", when: "editorFocus" }]
+      [{ name: "myCommand", when: "editorFocus" }],
     );
 
     expect(result).toEqual([
@@ -16,28 +16,24 @@ describe("generateOverrideDefaultBindings", () => {
   });
 
   it("should handle keys with no default bindings", () => {
-    const result = generateOverrideDefaultBindings(
-      "ctrl+alt+x",
-      [],
-      [{ name: "customCommand" }]
-    );
+    const result = generateOverrideDefaultBindings("ctrl+alt+x", [], [{ name: "customCommand" }]);
 
     expect(result.length).toBe(1);
-    expect(result[0].command).toBe("customCommand");
+    expect(result[0]!.command).toBe("customCommand");
   });
 
   it("should handle multiple defaults and custom commands", () => {
     const result = generateOverrideDefaultBindings(
       "ctrl+k",
       ["default1", "default2"],
-      [{ name: "custom1" }, { name: "custom2" }]
+      [{ name: "custom1" }, { name: "custom2" }],
     );
 
     expect(result.length).toBe(4);
-    expect(result[0].command).toBe("-default1");
-    expect(result[1].command).toBe("-default2");
-    expect(result[2].command).toBe("custom1");
-    expect(result[3].command).toBe("custom2");
+    expect(result[0]!.command).toBe("-default1");
+    expect(result[1]!.command).toBe("-default2");
+    expect(result[2]!.command).toBe("custom1");
+    expect(result[3]!.command).toBe("custom2");
   });
 
   it("should preserve args and when conditions", () => {
@@ -45,17 +41,17 @@ describe("generateOverrideDefaultBindings", () => {
       "ctrl+h",
       ["editor.action.startFindReplaceAction"],
       [
-        { 
-          name: "customFindReplace", 
+        {
+          name: "customFindReplace",
           when: "editorTextFocus && !editorReadonly",
-          args: { query: "test", isRegex: true }
-        }
-      ]
+          args: { query: "test", isRegex: true },
+        },
+      ],
     );
 
     expect(result.length).toBe(2);
-    expect(result[0].command).toBe("-editor.action.startFindReplaceAction");
-    expect(result[1].when).toBe("editorTextFocus && !editorReadonly");
-    expect(result[1].args).toEqual({ query: "test", isRegex: true });
+    expect(result[0]!.command).toBe("-editor.action.startFindReplaceAction");
+    expect(result[1]!.when).toBe("editorTextFocus && !editorReadonly");
+    expect(result[1]!.args).toEqual({ query: "test", isRegex: true });
   });
 });

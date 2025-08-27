@@ -3,7 +3,7 @@ import type { Command, VSCodeKeybinding } from "../types";
 export const generateClearDefaultBindings = (
   key: string,
   defaultCommands: string[],
-  customCommands: Command[]
+  customCommands: Command[],
 ): VSCodeKeybinding[] => {
   const disableBindings = defaultCommands.map((cmd) => ({
     key,

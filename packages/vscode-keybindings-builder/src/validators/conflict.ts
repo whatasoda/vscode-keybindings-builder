@@ -1,9 +1,9 @@
-import type { RegisteredKey, VSCodeKeybinding, ConflictInfo } from "../types";
+import type { ConflictInfo, RegisteredKey, VSCodeKeybinding } from "../types";
 import { normalizeKey } from "../utils/normalize";
 
 export const detectConflicts = (
   builderKeys: Map<string, RegisteredKey>,
-  manualKeybindings: VSCodeKeybinding[]
+  manualKeybindings: VSCodeKeybinding[],
 ): ConflictInfo[] => {
   const conflicts: ConflictInfo[] = [];
 

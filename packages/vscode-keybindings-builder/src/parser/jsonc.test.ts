@@ -1,7 +1,7 @@
-import { describe, it, expect } from "bun:test";
-import { parseJSONC } from "./jsonc";
-import * as path from "path";
+import { describe, expect, it } from "bun:test";
 import * as fs from "fs";
+import * as path from "path";
+import { parseJSONC } from "./jsonc";
 
 describe("parseJSONC", () => {
   const fixturesPath = path.join(__dirname, "../integration/fixtures");
@@ -10,23 +10,23 @@ describe("parseJSONC", () => {
   it("should parse JSONC file with comments", () => {
     const content = fs.readFileSync(defaultKeybindingsPath, "utf-8");
     const result = parseJSONC(content);
-    
+
     expect(result.isOk()).toBe(true);
     if (result.isOk()) {
       expect(Array.isArray(result.value)).toBe(true);
-      expect(result.value.length).toBeGreaterThan(0);
+      expect((result.value as any).length).toBeGreaterThan(0);
     }
   });
 
   it("should extract all default keybindings", () => {
     const content = fs.readFileSync(defaultKeybindingsPath, "utf-8");
     const result = parseJSONC(content);
-    
+
     expect(result.isOk()).toBe(true);
     if (result.isOk()) {
-      expect(result.value.length).toBe(7);
-      expect(result.value[0].key).toBe("ctrl+x");
-      expect(result.value[0].command).toBe("editor.action.clipboardCutAction");
+      expect((result.value as any).length).toBe(7);
+      expect((result.value as any)[0].key).toBe("ctrl+x");
+      expect((result.value as any)[0].command).toBe("editor.action.clipboardCutAction");
     }
   });
 
@@ -38,11 +38,11 @@ describe("parseJSONC", () => {
     ]
     `;
     const result = parseJSONC(content);
-    
+
     expect(result.isOk()).toBe(true);
     if (result.isOk()) {
-      expect(result.value.length).toBe(1);
-      expect(result.value[0].key).toBe("ctrl+a");
+      expect((result.value as any).length).toBe(1);
+      expect((result.value as any)[0].key).toBe("ctrl+a");
     }
   });
 
@@ -55,11 +55,11 @@ describe("parseJSONC", () => {
     ]
     `;
     const result = parseJSONC(content);
-    
+
     expect(result.isOk()).toBe(true);
     if (result.isOk()) {
-      expect(result.value.length).toBe(1);
-      expect(result.value[0].key).toBe("ctrl+b");
+      expect((result.value as any).length).toBe(1);
+      expect((result.value as any)[0].key).toBe("ctrl+b");
     }
   });
 
@@ -71,10 +71,10 @@ describe("parseJSONC", () => {
     ]
     `;
     const result = parseJSONC(content);
-    
+
     expect(result.isOk()).toBe(true);
     if (result.isOk()) {
-      expect(result.value.length).toBe(2);
+      expect((result.value as any).length).toBe(2);
     }
   });
 
@@ -85,7 +85,7 @@ describe("parseJSONC", () => {
     ]
     `;
     const result = parseJSONC(content);
-    
+
     expect(result.isErr()).toBe(true);
     if (result.isErr()) {
       expect(result.error.type).toBe("JSONC_PARSE_ERROR");
@@ -102,11 +102,11 @@ describe("parseJSONC", () => {
     ]
     `;
     const result = parseJSONC(content);
-    
+
     expect(result.isOk()).toBe(true);
     if (result.isOk()) {
-      expect(result.value.length).toBe(1);
-      expect(result.value[0].command).toBe("editor.action.duplicateLine");
+      expect((result.value as any).length).toBe(1);
+      expect((result.value as any)[0].command).toBe("editor.action.duplicateLine");
     }
   });
 
@@ -122,10 +122,10 @@ describe("parseJSONC", () => {
     ]
     `;
     const result = parseJSONC(content);
-    
+
     expect(result.isOk()).toBe(true);
     if (result.isOk()) {
-      const kb = result.value[0];
+      const kb = (result.value as any)[0];
       expect(kb.key).toBe("ctrl+e");
       expect(kb.command).toBe("editor.action.test");
       expect(kb.when).toBe("editorTextFocus");

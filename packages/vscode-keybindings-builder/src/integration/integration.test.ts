@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from "bun:test";
-import { createBuilder } from "../index";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import * as fs from "fs";
-import * as path from "path";
 import * as os from "os";
+import * as path from "path";
+import { createBuilder } from "../index";
 
 describe("End-to-end integration", () => {
   let tempDir: string;
@@ -11,15 +11,15 @@ describe("End-to-end integration", () => {
   beforeEach(() => {
     // Create a temporary directory for test outputs
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "keybindings-test-"));
-    
+
     // Copy fixtures to temp directory
     fs.copyFileSync(
       path.join(fixturesDir, "default-keybindings.jsonc"),
-      path.join(tempDir, "default-keybindings.jsonc")
+      path.join(tempDir, "default-keybindings.jsonc"),
     );
     fs.copyFileSync(
       path.join(fixturesDir, "current-keybindings.json"),
-      path.join(tempDir, "current-keybindings.json")
+      path.join(tempDir, "current-keybindings.json"),
     );
   });
 
@@ -73,16 +73,16 @@ describe("End-to-end integration", () => {
       // Verify content
       const content = JSON.parse(fs.readFileSync(outputPath, "utf-8"));
       expect(Array.isArray(content)).toBe(true);
-      
+
       // Should have disable command for ctrl+p default
       const disableCommand = content.find(
-        (kb: any) => kb.key === "ctrl+p" && kb.command === "-workbench.action.quickOpen"
+        (kb: any) => kb.key === "ctrl+p" && kb.command === "-workbench.action.quickOpen",
       );
       expect(disableCommand).toBeDefined();
 
       // Should have custom command for ctrl+p
       const customCommand = content.find(
-        (kb: any) => kb.key === "ctrl+p" && kb.command === "myExtension.quickOpen"
+        (kb: any) => kb.key === "ctrl+p" && kb.command === "myExtension.quickOpen",
       );
       expect(customCommand).toBeDefined();
       expect(customCommand.when).toBe("editorFocus");
@@ -118,13 +118,13 @@ describe("End-to-end integration", () => {
       // Should preserve non-conflicting manual keybindings
       const outputPath = path.join(tempDir, "output.json");
       const content = JSON.parse(fs.readFileSync(outputPath, "utf-8"));
-      
+
       // Check preserved keybindings
       const preserved = content.find(
-        (kb: any) => kb.key === "ctrl+k ctrl+t" && kb.command === "workbench.action.selectTheme"
+        (kb: any) => kb.key === "ctrl+k ctrl+t" && kb.command === "workbench.action.selectTheme",
       );
       expect(preserved).toBeDefined();
-      
+
       expect(buildResult.value.warnings.length).toBeGreaterThan(0);
     }
   });
@@ -158,7 +158,7 @@ describe("End-to-end integration", () => {
       expect(buildResult.error.type).toBe("CONFLICT_DETECTED");
       if (buildResult.error.type === "CONFLICT_DETECTED") {
         expect(buildResult.error.conflicts.length).toBe(1);
-        expect(buildResult.error.conflicts[0].key).toBe("ctrl+p");
+        expect(buildResult.error.conflicts[0]!.key).toBe("ctrl+p");
       }
     }
   });
@@ -195,7 +195,7 @@ describe("End-to-end integration", () => {
       // All 3 manual keybindings should be preserved
       const manualKeys = ["ctrl+k ctrl+t", "alt+shift+f"];
       // ctrl+p is not included since we didn't register it
-      
+
       for (const key of manualKeys) {
         const found = content.find((kb: any) => kb.key === key);
         expect(found).toBeDefined();
@@ -251,26 +251,26 @@ describe("End-to-end integration", () => {
 
       // Check clearDefault: should have disable + custom
       const ctrlXDisable = content.find(
-        (kb: any) => kb.key === "ctrl+x" && kb.command === "-editor.action.clipboardCutAction"
+        (kb: any) => kb.key === "ctrl+x" && kb.command === "-editor.action.clipboardCutAction",
       );
       expect(ctrlXDisable).toBeDefined();
 
       // Check preserveDefault: should only have custom
       const ctrlCCustom = content.find(
-        (kb: any) => kb.key === "ctrl+c" && kb.command === "myExtension.customCopy"
+        (kb: any) => kb.key === "ctrl+c" && kb.command === "myExtension.customCopy",
       );
       expect(ctrlCCustom).toBeDefined();
       expect(ctrlCCustom.when).toBe("myCondition");
 
       // Check no disable for preserve
       const ctrlCDisable = content.find(
-        (kb: any) => kb.key === "ctrl+c" && kb.command.startsWith("-")
+        (kb: any) => kb.key === "ctrl+c" && kb.command.startsWith("-"),
       );
       expect(ctrlCDisable).toBeUndefined();
 
       // Check overrideDefault: should have disable + custom
       const ctrlVDisable = content.find(
-        (kb: any) => kb.key === "ctrl+v" && kb.command === "-editor.action.clipboardPasteAction"
+        (kb: any) => kb.key === "ctrl+v" && kb.command === "-editor.action.clipboardPasteAction",
       );
       expect(ctrlVDisable).toBeDefined();
     }
@@ -297,14 +297,14 @@ describe("End-to-end integration", () => {
     }
 
     const buildResult = await builder.build();
-    
+
     // Should succeed with warning, using empty defaults
     expect(buildResult.isOk()).toBe(true);
-    
+
     if (buildResult.isOk()) {
       const outputPath = path.join(tempDir, "output.json");
       const content = JSON.parse(fs.readFileSync(outputPath, "utf-8"));
-      
+
       // Should only have the custom command, no disable commands
       expect(content.length).toBe(1);
       expect(content[0].command).toBe("myCommand");

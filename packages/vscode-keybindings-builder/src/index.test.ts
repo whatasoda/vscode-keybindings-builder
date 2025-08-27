@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { createBuilder } from "./index";
 
 describe("createBuilder", () => {
@@ -15,8 +15,7 @@ describe("createBuilder", () => {
   });
 
   it("should return error when dirname is not provided", () => {
-    // @ts-expect-error Testing invalid input
-    const result = createBuilder({});
+    const result = createBuilder({} as any);
     expect(result.isErr()).toBe(true);
     if (result.isErr()) {
       expect(result.error.type).toBe("CONFIG_INVALID");
@@ -50,8 +49,7 @@ describe("createBuilder", () => {
 
   it("should return validation error for invalid config", () => {
     const result = createBuilder({
-      // @ts-expect-error Testing invalid input
-      dirname: 123, // Should be string
+      dirname: 123 as any, // Should be string
     });
     expect(result.isErr()).toBe(true);
     if (result.isErr()) {

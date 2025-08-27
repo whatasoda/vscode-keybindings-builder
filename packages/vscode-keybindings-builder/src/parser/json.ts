@@ -1,4 +1,4 @@
-import { Result, ok, err } from "neverthrow";
+import { err, ok, type Result } from "neverthrow";
 import type { BuilderError } from "../errors";
 
 export function parseJSON(content: string, path: string): Result<unknown, BuilderError> {

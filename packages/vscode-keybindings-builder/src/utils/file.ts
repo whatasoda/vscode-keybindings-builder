@@ -1,5 +1,5 @@
-import { Result, ok, err } from "neverthrow";
 import * as fs from "fs";
+import { err, ok, type Result } from "neverthrow";
 import type { BuilderError } from "../errors";
 
 export function readFileSync(path: string): Result<string, BuilderError> {
@@ -37,7 +37,10 @@ export async function readFileAsync(path: string): Promise<Result<string, Builde
   }
 }
 
-export async function writeFileAsync(path: string, content: string): Promise<Result<void, BuilderError>> {
+export async function writeFileAsync(
+  path: string,
+  content: string,
+): Promise<Result<void, BuilderError>> {
   try {
     // External library may throw
     await fs.promises.writeFile(path, content, "utf-8");

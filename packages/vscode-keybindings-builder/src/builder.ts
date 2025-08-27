@@ -1,19 +1,16 @@
-import { Result, ok, err } from "neverthrow";
-import type {
-  BuilderConfig,
-  Command,
-  KeyHandlingMode,
-  RegisteredKey,
-  BuildSuccess,
-} from "./types";
+import { err, ok, type Result } from "neverthrow";
+import { buildKeybindings } from "./build";
 import type { BuilderError } from "./errors";
+import type { BuilderConfig, BuildSuccess, Command, KeyHandlingMode, RegisteredKey } from "./types";
 import { normalizeKey } from "./utils/normalize";
 import { validateKeyFormat } from "./validators/key";
-import { buildKeybindings } from "./build";
 
 export interface KeybindingBuilder {
   key(combination: string, mode: KeyHandlingMode): Result<KeybindingBuilder, BuilderError>;
-  command(name: string, options?: { when?: string; args?: unknown }): Result<KeybindingBuilder, BuilderError>;
+  command(
+    name: string,
+    options?: { when?: string; args?: unknown },
+  ): Result<KeybindingBuilder, BuilderError>;
   register(): Result<KeybindingBuilder, BuilderError>;
   build(): Promise<Result<BuildSuccess, BuilderError>>;
   getRegisteredKeys(): Map<string, RegisteredKey>;
@@ -50,7 +47,10 @@ export function createKeybindingsBuilder(config: BuilderConfig): KeybindingBuild
       return ok(builder);
     },
 
-    command(name: string, options?: { when?: string; args?: unknown }): Result<KeybindingBuilder, BuilderError> {
+    command(
+      name: string,
+      options?: { when?: string; args?: unknown },
+    ): Result<KeybindingBuilder, BuilderError> {
       if (!currentKey) {
         return err({ type: "NO_KEY_ACTIVE", operation: "command" } as const);
       }

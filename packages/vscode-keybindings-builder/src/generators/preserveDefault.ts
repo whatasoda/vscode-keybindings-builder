@@ -2,7 +2,7 @@ import type { Command, VSCodeKeybinding } from "../types";
 
 export const generatePreserveDefaultBindings = (
   key: string,
-  customCommands: Command[]
+  customCommands: Command[],
 ): VSCodeKeybinding[] => {
   return customCommands.map((cmd) => ({
     key,

@@ -3,7 +3,7 @@ import type { Command, VSCodeKeybinding } from "../types";
 export const generateOverrideDefaultBindings = (
   key: string,
   defaultCommands: string[],
-  customCommands: Command[]
+  customCommands: Command[],
 ): VSCodeKeybinding[] => {
   // Only disable defaults if there are defaults to override
   const disableBindings = defaultCommands.map((cmd) => ({

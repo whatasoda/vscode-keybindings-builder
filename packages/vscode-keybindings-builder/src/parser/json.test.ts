@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { parseJSON } from "./json";
 
 describe("parseJSON", () => {
@@ -7,29 +7,31 @@ describe("parseJSON", () => {
       { "key": "ctrl+a", "command": "selectAll" }
     ]`;
     const result = parseJSON(content, "test.json");
-    
+
     expect(result.isOk()).toBe(true);
     if (result.isOk()) {
       expect(Array.isArray(result.value)).toBe(true);
-      expect(result.value[0].key).toBe("ctrl+a");
+      expect((result.value as any)[0].key).toBe("ctrl+a");
     }
   });
 
   it("should return error for invalid JSON", () => {
     const content = `{ invalid json }`;
     const result = parseJSON(content, "test.json");
-    
+
     expect(result.isErr()).toBe(true);
     if (result.isErr()) {
       expect(result.error.type).toBe("JSON_PARSE_ERROR");
-      expect(result.error.path).toBe("test.json");
+      if (result.error.type === "JSON_PARSE_ERROR") {
+        expect(result.error.path).toBe("test.json");
+      }
     }
   });
 
   it("should parse empty array", () => {
     const content = `[]`;
     const result = parseJSON(content, "test.json");
-    
+
     expect(result.isOk()).toBe(true);
     if (result.isOk()) {
       expect(result.value).toEqual([]);
@@ -44,10 +46,10 @@ describe("parseJSON", () => {
       "args": { "force": true }
     }]`;
     const result = parseJSON(content, "test.json");
-    
+
     expect(result.isOk()).toBe(true);
     if (result.isOk()) {
-      const kb = result.value[0];
+      const kb = (result.value as any)[0];
       expect(kb.key).toBe("ctrl+s");
       expect(kb.command).toBe("workbench.action.files.save");
       expect(kb.when).toBe("editorTextFocus");

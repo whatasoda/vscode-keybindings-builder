@@ -16,7 +16,7 @@
   {
     "key": "ctrl+v",
     "command": "editor.action.clipboardPasteAction",
-    "when": "textInputFocus && !editorReadonly", // Inline comment
+    "when": "textInputFocus && !editorReadonly" // Inline comment
   },
   // Quick open
   {
@@ -30,7 +30,7 @@
   // File operations
   {
     "key": "ctrl+s",
-    "command": "workbench.action.files.save",
+    "command": "workbench.action.files.save"
   },
   {
     "key": "ctrl+shift+s",

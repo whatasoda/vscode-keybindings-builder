@@ -1,12 +1,12 @@
-import { Result, ok, err } from "neverthrow";
-import { BuilderConfigSchema } from "./schemas";
+import { err, ok, type Result } from "neverthrow";
 import { createKeybindingsBuilder, type KeybindingBuilder } from "./builder";
-import type { BuilderConfig } from "./types";
 import type { BuilderError } from "./errors";
+import { BuilderConfigSchema } from "./schemas";
+import type { BuilderConfig } from "./types";
 
 export function createBuilder(config: unknown): Result<KeybindingBuilder, BuilderError> {
   const validation = BuilderConfigSchema.safeParse(config);
-  
+
   if (!validation.success) {
     return err({
       type: "CONFIG_INVALID",
@@ -20,14 +20,13 @@ export function createBuilder(config: unknown): Result<KeybindingBuilder, Builde
 
 // Export types for consumers
 export type { KeybindingBuilder } from "./builder";
-export type { 
+export type { BuilderError } from "./errors";
+export type {
   BuilderConfig,
-  KeyHandlingMode,
+  BuildSuccess,
   Command,
+  ConflictInfo,
+  KeyHandlingMode,
   RegisteredKey,
   VSCodeKeybinding,
-  BuildSuccess,
-  ConflictInfo,
 } from "./types";
-
-export type { BuilderError } from "./errors";

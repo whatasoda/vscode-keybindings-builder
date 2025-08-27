@@ -1,4 +1,4 @@
-import { Result, ok, err } from "neverthrow";
+import { err, ok, type Result } from "neverthrow";
 import type { BuilderError } from "../errors";
 
 export const validateKeyFormat = (key: string): Result<void, BuilderError> => {
@@ -14,24 +14,39 @@ export const validateKeyFormat = (key: string): Result<void, BuilderError> => {
 
   const validModifiers = ["cmd", "ctrl", "alt", "shift", "meta", "win", "option"];
   const specialKeys = [
-    "escape", "enter", "tab", "space", "backspace", "delete",
-    "up", "down", "left", "right",
-    "home", "end", "pageup", "pagedown",
-    "insert", "pause", "capslock", "numlock", "scrolllock",
+    "escape",
+    "enter",
+    "tab",
+    "space",
+    "backspace",
+    "delete",
+    "up",
+    "down",
+    "left",
+    "right",
+    "home",
+    "end",
+    "pageup",
+    "pagedown",
+    "insert",
+    "pause",
+    "capslock",
+    "numlock",
+    "scrolllock",
   ];
   const functionKeys = Array.from({ length: 12 }, (_, i) => `f${i + 1}`);
 
   // Check each part
   for (const part of parts) {
     const lowerPart = part.toLowerCase();
-    
+
     // Check if it's a valid modifier, special key, function key, or single character
     const isModifier = validModifiers.includes(lowerPart);
     const isSpecialKey = specialKeys.includes(lowerPart);
     const isFunctionKey = functionKeys.includes(lowerPart);
     const isSingleChar = part.length === 1;
     const isNumpadKey = lowerPart.startsWith("numpad");
-    
+
     if (!isModifier && !isSpecialKey && !isFunctionKey && !isSingleChar && !isNumpadKey) {
       // Check for chord notation (e.g., "ctrl+k ctrl+s")
       if (part.includes(" ") && key.includes(" ")) {
@@ -45,7 +60,7 @@ export const validateKeyFormat = (key: string): Result<void, BuilderError> => {
         }
         return ok(undefined);
       }
-      
+
       return err({
         type: "INVALID_KEY_FORMAT",
         key,
