@@ -1,0 +1,39 @@
+// Default VSCode keybindings for testing
+[
+  // Editor commands
+  {
+    "key": "ctrl+x",
+    "command": "editor.action.clipboardCutAction",
+    "when": "textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+c",
+    "command": "editor.action.clipboardCopyAction", // Copy action
+    "when": "textInputFocus"
+  },
+  /* Multi-line comment
+     for testing parser */
+  {
+    "key": "ctrl+v",
+    "command": "editor.action.clipboardPasteAction",
+    "when": "textInputFocus && !editorReadonly", // Inline comment
+  },
+  // Quick open
+  {
+    "key": "ctrl+p",
+    "command": "workbench.action.quickOpen"
+  },
+  {
+    "key": "ctrl+shift+p",
+    "command": "workbench.action.showCommands"
+  },
+  // File operations
+  {
+    "key": "ctrl+s",
+    "command": "workbench.action.files.save",
+  },
+  {
+    "key": "ctrl+shift+s",
+    "command": "workbench.action.files.saveAs"
+  }
+]
