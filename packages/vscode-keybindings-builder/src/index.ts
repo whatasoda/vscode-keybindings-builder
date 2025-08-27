@@ -19,8 +19,8 @@ export function createBuilder(config: unknown): Result<KeybindingBuilder, Builde
 }
 
 // Export types for consumers
+export type { KeybindingBuilder } from "./builder";
 export type { 
-  KeybindingBuilder,
   BuilderConfig,
   KeyHandlingMode,
   Command,

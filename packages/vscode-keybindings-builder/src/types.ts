@@ -1,5 +1,3 @@
-import type { z } from "zod";
-
 export type KeyHandlingMode = "clearDefault" | "preserveDefault" | "overrideDefault";
 
 export interface Command {

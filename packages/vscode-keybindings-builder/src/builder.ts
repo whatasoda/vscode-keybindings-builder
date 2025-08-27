@@ -9,6 +9,7 @@ import type {
 import type { BuilderError } from "./errors";
 import { normalizeKey } from "./utils/normalize";
 import { validateKeyFormat } from "./validators/key";
+import { buildKeybindings } from "./build";
 
 export interface KeybindingBuilder {
   key(combination: string, mode: KeyHandlingMode): Result<KeybindingBuilder, BuilderError>;
@@ -86,14 +87,7 @@ export function createKeybindingsBuilder(config: BuilderConfig): KeybindingBuild
     },
 
     async build(): Promise<Result<BuildSuccess, BuilderError>> {
-      // TODO: Implement build logic in later cycles
-      return ok({
-        type: "BUILD_SUCCESS",
-        keybindingsCount: registeredKeys.size,
-        preservedCount: 0,
-        outputPath: config.outputFile || "keybindings-generated.json",
-        warnings: [],
-      } as const);
+      return buildKeybindings(builder);
     },
 
     getRegisteredKeys: () => new Map(registeredKeys),

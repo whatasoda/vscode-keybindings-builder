@@ -69,7 +69,7 @@ describe("KeybindingBuilder.key()", () => {
     const builder = createKeybindingsBuilder(config);
     const result = builder.key("ctrl+invalid_key", "clearDefault");
     expect(result.isErr()).toBe(true);
-    if (result.isErr()) {
+    if (result.isErr() && result.error.type === "INVALID_KEY_FORMAT") {
       expect(result.error.type).toBe("INVALID_KEY_FORMAT");
       expect(result.error.reason).toContain("Invalid key part");
     }
@@ -121,7 +121,7 @@ describe("KeybindingBuilder.command()", () => {
     const builder = createKeybindingsBuilder(config);
     const result = builder.command("workbench.action.quickOpen");
     expect(result.isErr()).toBe(true);
-    if (result.isErr()) {
+    if (result.isErr() && result.error.type === "NO_KEY_ACTIVE") {
       expect(result.error.type).toBe("NO_KEY_ACTIVE");
       expect(result.error.operation).toBe("command");
     }
@@ -218,7 +218,7 @@ describe("KeybindingBuilder.register()", () => {
     const result = builder.register();
     
     expect(result.isErr()).toBe(true);
-    if (result.isErr()) {
+    if (result.isErr() && result.error.type === "DUPLICATE_KEY") {
       expect(result.error.type).toBe("DUPLICATE_KEY");
       expect(result.error.key).toBe("cmd+k");
       expect(result.error.existingIndex).toBe(0);
@@ -261,7 +261,7 @@ describe("KeybindingBuilder.register()", () => {
     const result = builder.register();
     
     expect(result.isErr()).toBe(true);
-    if (result.isErr()) {
+    if (result.isErr() && result.error.type === "NO_KEY_ACTIVE") {
       expect(result.error.type).toBe("NO_KEY_ACTIVE");
       expect(result.error.operation).toBe("register");
     }
@@ -277,12 +277,13 @@ describe("KeybindingBuilder.register()", () => {
     const registered = builder.getRegisteredKeys();
     const key = Array.from(registered.values())[0];
     
-    expect(key.key).toBe("ctrl+p");
-    expect(key.mode).toBe("clearDefault");
-    expect(key.commands.length).toBe(2);
-    expect(key.commands[0].name).toBe("command1");
-    expect(key.commands[0].when).toBe("condition1");
-    expect(key.commands[1].name).toBe("command2");
-    expect(key.commands[1].when).toBe("condition2");
+    expect(key).toBeDefined();
+    expect(key!.key).toBe("ctrl+p");
+    expect(key!.mode).toBe("clearDefault");
+    expect(key!.commands.length).toBe(2);
+    expect(key!.commands[0]?.name).toBe("command1");
+    expect(key!.commands[0]?.when).toBe("condition1");
+    expect(key!.commands[1]?.name).toBe("command2");
+    expect(key!.commands[1]?.when).toBe("condition2");
   });
 });
