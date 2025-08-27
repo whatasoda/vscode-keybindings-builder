@@ -2,8 +2,7 @@ import { createBuilder } from "vscode-keyboard-builder";
 
 const builder = createBuilder({
   dirname: import.meta.dirname,
-  keybindingsPath: "",
-  outputPath: "",
+  currentKeybindingPath: "",
 });
 
 const registerZoom = () => {
