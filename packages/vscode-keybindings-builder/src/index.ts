@@ -1,21 +1,18 @@
-import { err, ok, type Result } from "neverthrow";
 import { createKeybindingsBuilder, type KeybindingBuilder } from "./builder";
-import type { BuilderError } from "./errors";
 import { BuilderConfigSchema } from "./schemas";
 import type { BuilderConfig } from "./types";
 
-export function createBuilder(config: unknown): Result<KeybindingBuilder, BuilderError> {
+export function createBuilder(config: unknown): KeybindingBuilder {
   const validation = BuilderConfigSchema.safeParse(config);
 
   if (!validation.success) {
-    return err({
-      type: "CONFIG_INVALID",
-      errors: validation.error,
-    } as const);
+    // biome-ignore lint/suspicious/noConsole: make process fail
+    console.error(validation.error);
+    process.exit(1);
   }
 
   const validatedConfig: BuilderConfig = validation.data;
-  return ok(createKeybindingsBuilder(validatedConfig));
+  return createKeybindingsBuilder(validatedConfig);
 }
 
 // Export types for consumers
