@@ -12,10 +12,24 @@ export const detectConflicts = (
 
     for (const [normalizedBuilderKey, registered] of builderKeys) {
       if (normalizedManualKey === normalizedBuilderKey) {
+        // Check if commands are different (true conflict)
+        const builderCommand = registered.commands[0]?.name || "";
+        
+        // Skip if it's the exact same command (not a conflict)
+        if (manual.command === builderCommand) {
+          continue;
+        }
+        
+        // Skip if manual command is a disable command for a default we're clearing
+        if (registered.mode === "clearDefault" && manual.command.startsWith("-")) {
+          continue;
+        }
+        
+        // This is a true conflict - same key, different commands
         conflicts.push({
           key: manual.key,
           manualCommand: manual.command,
-          builderCommand: registered.commands[0]?.name || "",
+          builderCommand,
         });
       }
     }

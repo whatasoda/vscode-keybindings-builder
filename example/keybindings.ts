@@ -6,58 +6,57 @@ const builderResult = createBuilder({
   currentKeybindingPath: `${process.env.HOME}/Library/Application Support/Cursor/User/keybindings.json`,
 });
 
+// createBuilder now directly returns the builder (not a Result)
 const builder = builderResult;
 
 const plus_minus = () => {
-  builder
-    .key("cmd+=", "clearDefault")
-    .command("workbench.action.zoomIn")
-    .register();
-  builder
-    .key("cmd+-", "clearDefault")
-    .command("workbench.action.zoomOut")
-    .register();
-  builder
-    .key("cmd+shift+=", "clearDefault")
-    .command("workbench.action.minimizeOtherEditors")
-    .register();
-  builder
-    .key("cmd+shift+-", "clearDefault")
-    .command("workbench.action.evenEditorWidths")
-    .register();
+  const k1 = builder.key("cmd+=", "clearDefault").command("workbench.action.zoomIn");
+  k1.register();
+
+  const k2 = builder.key("cmd+-", "clearDefault").command("workbench.action.zoomOut");
+  k2.register();
+
+  const k3 = builder.key("cmd+shift+=", "clearDefault").command("workbench.action.minimizeOtherEditors");
+  k3.register();
+
+  const k4 = builder.key("cmd+shift+-", "clearDefault").command("workbench.action.evenEditorWidths");
+  k4.register();
 };
 
 const registerTextManipulation = () => {
-  builder
+  const k1 = builder
     .key("ctrl+shift+cmd+l", "clearDefault")
     .command("editor.action.rename", {
       when: "editorHasRenameProvider && editorTextFocus && !editorReadonly",
     })
     .command("renameFile", {
       when: "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus",
-    })
-    .register();
-  builder
+    });
+  k1.register();
+
+  const k2 = builder
     .key("ctrl+shift+l", "clearDefault")
     .command("workbench.action.changeLanguageMode", {
       when: "editorHasRenameProvider && editorTextFocus && !editorReadonly",
-    })
-    .register();
-  builder
+    });
+  k2.register();
+
+  const k3 = builder
     .key("cmd+ctrl+up", "clearDefault")
-    .command("editor.action.moveLinesUpAction", { when: "editorTextFocus" })
-    .register();
-  builder
+    .command("editor.action.moveLinesUpAction", { when: "editorTextFocus" });
+  k3.register();
+
+  const k4 = builder
     .key("cmd+ctrl+down", "clearDefault")
-    .command("editor.action.moveLinesDownAction", { when: "editorTextFocus" })
-    .register();
+    .command("editor.action.moveLinesDownAction", { when: "editorTextFocus" });
+  k4.register();
 };
 
 const registerQuickOpen = () => {
-  builder
+  const k = builder
     .key("cmd+t", "clearDefault")
-    .command("workbench.action.quickOpen")
-    .register();
+    .command("workbench.action.quickOpen");
+  k.register();
 };
 
 const registerWordNavigation = () => {
@@ -65,34 +64,41 @@ const registerWordNavigation = () => {
     .key("alt+left", "clearDefault")
     .command("subwordNavigation.cursorSubwordLeft", { when: "textInputFocus" })
     .register();
+
   builder
     .key("alt+shift+left", "clearDefault")
     .command("subwordNavigation.cursorSubwordLeftSelect", {
       when: "textInputFocus",
     })
     .register();
+
   builder
     .key("ctrl+cmd+left", "clearDefault")
     .command("cursorWordLeft", { when: "editorTextFocus" })
     .register();
+
   builder
     .key("ctrl+cmd+shift+left", "clearDefault")
     .command("cursorWordLeftSelect", { when: "editorTextFocus" })
     .register();
+
   builder
     .key("alt+right", "clearDefault")
     .command("subwordNavigation.cursorSubwordRight", { when: "textInputFocus" })
     .register();
+
   builder
     .key("alt+shift+right", "clearDefault")
     .command("subwordNavigation.cursorSubwordRightSelect", {
       when: "textInputFocus",
     })
     .register();
+
   builder
     .key("ctrl+cmd+right", "clearDefault")
     .command("cursorWordRight", { when: "editorTextFocus" })
     .register();
+
   builder
     .key("ctrl+cmd+shift+right", "clearDefault")
     .command("cursorWordRightSelect", { when: "editorTextFocus" })
@@ -104,10 +110,12 @@ const registerSelection = () => {
     .key("shift+cmd+d", "clearDefault")
     .command("editor.action.selectHighlights", { when: "editorFocus" })
     .register();
+
   builder
     .key("alt+up", "clearDefault")
     .command("editor.action.insertCursorAbove", { when: "editorTextFocus" })
     .register();
+
   builder
     .key("alt+down", "clearDefault")
     .command("editor.action.insertCursorBelow", { when: "editorTextFocus" })
@@ -121,6 +129,7 @@ const registerCodeNavigation = () => {
       when: "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor",
     })
     .register();
+
   builder
     .key("alt+enter", "clearDefault")
     .command("editor.action.showHover", { when: "editorTextFocus" })
@@ -132,6 +141,7 @@ const registerDeleteOperations = () => {
     .key("ctrl+cmd+backspace", "clearDefault")
     .command("editor.action.deleteLines", { when: "editorTextFocus" })
     .register();
+
   builder
     .key("backspace", "preserveDefault")
     .command("moveFileToTrash", { when: "filesExplorerFocus && !inputFocus" })
@@ -139,6 +149,7 @@ const registerDeleteOperations = () => {
 };
 
 const registerEmmet = () => {
+  // Just clear the default without adding a new command
   builder.key("cmd+e", "clearDefault").register();
 };
 
@@ -147,12 +158,14 @@ const registerExplorer = () => {
     .key("a", "clearDefault")
     .command("explorer.newFile", { when: "filesExplorerFocus && !inputFocus" })
     .register();
+
   builder
     .key("shift+a", "clearDefault")
     .command("explorer.newFolder", {
       when: "filesExplorerFocus && !inputFocus",
     })
     .register();
+
   builder
     .key("ctrl+space", "clearDefault")
     .command("explorer.openAndPassFocus", {
@@ -173,6 +186,7 @@ const registerNavigation = () => {
     .key("cmd+[", "clearDefault")
     .command("workbench.action.navigateBack", { when: "canNavigateBack" })
     .register();
+
   builder
     .key("cmd+]", "clearDefault")
     .command("workbench.action.navigateForward", { when: "canNavigateForward" })
@@ -186,12 +200,14 @@ const registerGit = () => {
       when: "editorTextFocus && config.gitlens.keymap == 'chorded' && resource in 'gitlens:tabs:tracked'",
     })
     .register();
+
   builder
     .key("shift+cmd+]", "clearDefault")
     .command("gitlens.diffWithNext", {
-      when: "editorTextFocus && gitlens:enabled && config.gitlens.keymap == 'chorded' && resourceScheme =~ /^(gitlens|git|pr)$/",
+      when: "editorTextFocus && gitlens:enabled && config.gitlens.keymap == 'chorded' && resourceScheme =~ /^(gitlens|git|pr)$/'",
     })
     .register();
+
   builder
     .key("shift+cmd+g", "clearDefault")
     .command("workbench.view.scm", { when: "workbench.scm.active" })
@@ -264,6 +280,7 @@ const registerCopyPath = () => {
     .key("cmd+ctrl+shift+c", "clearDefault")
     .command("copyRelativeFilePath")
     .register();
+
   builder
     .key("shift+cmd+c", "clearDefault")
     .command("gitlens.copyRemoteFileUrlToClipboard")
@@ -279,12 +296,12 @@ const registerReferences = () => {
     .register();
 };
 
+// Register all keybindings
 plus_minus();
 registerTextManipulation();
 registerQuickOpen();
 registerWordNavigation();
 registerSelection();
-registerWordNavigation();
 registerCodeNavigation();
 registerDeleteOperations();
 registerEmmet();
@@ -298,6 +315,7 @@ registerWindowManagement();
 registerCopyPath();
 registerReferences();
 
+// Build
 builder.build().then((result) => {
   if (result.isErr()) {
     console.error("Build failed:", result.error);

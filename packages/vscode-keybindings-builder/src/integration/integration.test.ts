@@ -31,33 +31,22 @@ describe("End-to-end integration", () => {
   });
 
   it("should handle complete workflow with default keybindings", async () => {
-    const builderResult = createBuilder({
+    const builder = createBuilder({
       dirname: tempDir,
       defaultKeybindingsFile: "default-keybindings.jsonc",
       outputFile: "output.json",
     });
 
-    expect(builderResult.isOk()).toBe(true);
-    if (!builderResult.isOk()) return;
-
-    const builder = builderResult.value;
-
     // Register some keybindings
     const key1 = builder.key("ctrl+p", "clearDefault");
-    if (key1.isOk()) {
-      const cmd1 = key1.value.command("myExtension.quickOpen", { when: "editorFocus" });
-      if (cmd1.isOk()) {
-        cmd1.value.register();
-      }
-    }
+    const cmd1 = key1.command("myExtension.quickOpen", { when: "editorFocus" });
+    const result1 = cmd1.register();
+    expect(result1.isOk()).toBe(true);
 
     const key2 = builder.key("ctrl+shift+n", "preserveDefault");
-    if (key2.isOk()) {
-      const cmd2 = key2.value.command("myExtension.newFile");
-      if (cmd2.isOk()) {
-        cmd2.value.register();
-      }
-    }
+    const cmd2 = key2.command("myExtension.newFile");
+    const result2 = cmd2.register();
+    expect(result2.isOk()).toBe(true);
 
     const buildResult = await builder.build();
     expect(buildResult.isOk()).toBe(true);
@@ -90,26 +79,18 @@ describe("End-to-end integration", () => {
   });
 
   it("should handle workflow with current keybindings", async () => {
-    const builderResult = createBuilder({
+    const builder = createBuilder({
       dirname: tempDir,
       currentKeybindingPath: path.join(tempDir, "current-keybindings.json"),
       defaultKeybindingsFile: "default-keybindings.jsonc",
       outputFile: "output.json",
     });
 
-    expect(builderResult.isOk()).toBe(true);
-    if (!builderResult.isOk()) return;
-
-    const builder = builderResult.value;
-
     // Register keybinding that doesn't conflict
     const key1 = builder.key("ctrl+shift+x", "clearDefault");
-    if (key1.isOk()) {
-      const cmd1 = key1.value.command("myExtension.customCommand");
-      if (cmd1.isOk()) {
-        cmd1.value.register();
-      }
-    }
+    const cmd1 = key1.command("myExtension.customCommand");
+    const result1 = cmd1.register();
+    expect(result1.isOk()).toBe(true);
 
     const buildResult = await builder.build();
     expect(buildResult.isOk()).toBe(true);
@@ -129,27 +110,19 @@ describe("End-to-end integration", () => {
     }
   });
 
-  it("should fail on conflicts between builder and manual", async () => {
-    const builderResult = createBuilder({
+  it("should fail on conflicts when same key has different commands", async () => {
+    const builder = createBuilder({
       dirname: tempDir,
       currentKeybindingPath: path.join(tempDir, "current-keybindings.json"),
       defaultKeybindingsFile: "default-keybindings.jsonc",
       outputFile: "output.json",
     });
 
-    expect(builderResult.isOk()).toBe(true);
-    if (!builderResult.isOk()) return;
-
-    const builder = builderResult.value;
-
-    // Register keybinding that conflicts with manual
-    const key1 = builder.key("ctrl+p", "clearDefault"); // This conflicts with manual keybinding
-    if (key1.isOk()) {
-      const cmd1 = key1.value.command("differentCommand");
-      if (cmd1.isOk()) {
-        cmd1.value.register();
-      }
-    }
+    // Register keybinding that conflicts with manual (different command)
+    const key1 = builder.key("ctrl+p", "clearDefault");
+    const cmd1 = key1.command("differentCommand"); // Different from manual's "myExtension.quickOpen"
+    const result1 = cmd1.register();
+    expect(result1.isOk()).toBe(true);
 
     const buildResult = await builder.build();
     expect(buildResult.isErr()).toBe(true);
@@ -163,27 +136,53 @@ describe("End-to-end integration", () => {
     }
   });
 
-  it("should preserve non-conflicting manual keybindings", async () => {
-    const builderResult = createBuilder({
+  it("should NOT fail when same key has same command", async () => {
+    const builder = createBuilder({
       dirname: tempDir,
       currentKeybindingPath: path.join(tempDir, "current-keybindings.json"),
       defaultKeybindingsFile: "default-keybindings.jsonc",
       outputFile: "output.json",
     });
 
-    expect(builderResult.isOk()).toBe(true);
-    if (!builderResult.isOk()) return;
+    // Register keybinding with same command as manual
+    const key1 = builder.key("ctrl+p", "clearDefault");
+    const cmd1 = key1.command("myExtension.quickOpen"); // Same as manual keybinding
+    const result1 = cmd1.register();
+    expect(result1.isOk()).toBe(true);
 
-    const builder = builderResult.value;
+    const buildResult = await builder.build();
+    expect(buildResult.isOk()).toBe(true);
+
+    if (buildResult.isOk()) {
+      const outputPath = path.join(tempDir, "output.json");
+      const content = JSON.parse(fs.readFileSync(outputPath, "utf-8"));
+
+      // Should have the disable command and the custom command
+      const disableCommand = content.find(
+        (kb: any) => kb.key === "ctrl+p" && kb.command === "-workbench.action.quickOpen",
+      );
+      expect(disableCommand).toBeDefined();
+
+      const customCommand = content.find(
+        (kb: any) => kb.key === "ctrl+p" && kb.command === "myExtension.quickOpen",
+      );
+      expect(customCommand).toBeDefined();
+    }
+  });
+
+  it("should preserve non-conflicting manual keybindings", async () => {
+    const builder = createBuilder({
+      dirname: tempDir,
+      currentKeybindingPath: path.join(tempDir, "current-keybindings.json"),
+      defaultKeybindingsFile: "default-keybindings.jsonc",
+      outputFile: "output.json",
+    });
 
     // Register something that doesn't conflict
     const key1 = builder.key("f1", "overrideDefault");
-    if (key1.isOk()) {
-      const cmd1 = key1.value.command("myExtension.help");
-      if (cmd1.isOk()) {
-        cmd1.value.register();
-      }
-    }
+    const cmd1 = key1.command("myExtension.help");
+    const result1 = cmd1.register();
+    expect(result1.isOk()).toBe(true);
 
     const buildResult = await builder.build();
     expect(buildResult.isOk()).toBe(true);
@@ -204,43 +203,26 @@ describe("End-to-end integration", () => {
   });
 
   it("should generate correct output for mixed modes", async () => {
-    const builderResult = createBuilder({
+    const builder = createBuilder({
       dirname: tempDir,
       defaultKeybindingsFile: "default-keybindings.jsonc",
       outputFile: "output.json",
     });
 
-    expect(builderResult.isOk()).toBe(true);
-    if (!builderResult.isOk()) return;
-
-    const builder = builderResult.value;
-
     // Clear default
     const key1 = builder.key("ctrl+x", "clearDefault");
-    if (key1.isOk()) {
-      const cmd1 = key1.value.command("myExtension.customCut");
-      if (cmd1.isOk()) {
-        cmd1.value.register();
-      }
-    }
+    const cmd1 = key1.command("myExtension.customCut");
+    cmd1.register();
 
     // Preserve default
     const key2 = builder.key("ctrl+c", "preserveDefault");
-    if (key2.isOk()) {
-      const cmd2 = key2.value.command("myExtension.customCopy", { when: "myCondition" });
-      if (cmd2.isOk()) {
-        cmd2.value.register();
-      }
-    }
+    const cmd2 = key2.command("myExtension.customCopy", { when: "myCondition" });
+    cmd2.register();
 
     // Override default
     const key3 = builder.key("ctrl+v", "overrideDefault");
-    if (key3.isOk()) {
-      const cmd3 = key3.value.command("myExtension.customPaste");
-      if (cmd3.isOk()) {
-        cmd3.value.register();
-      }
-    }
+    const cmd3 = key3.command("myExtension.customPaste");
+    cmd3.register();
 
     const buildResult = await builder.build();
     expect(buildResult.isOk()).toBe(true);
@@ -277,24 +259,15 @@ describe("End-to-end integration", () => {
   });
 
   it("should handle missing default keybindings file", async () => {
-    const builderResult = createBuilder({
+    const builder = createBuilder({
       dirname: tempDir,
       defaultKeybindingsFile: "non-existent.jsonc",
       outputFile: "output.json",
     });
 
-    expect(builderResult.isOk()).toBe(true);
-    if (!builderResult.isOk()) return;
-
-    const builder = builderResult.value;
-
     const key1 = builder.key("ctrl+p", "clearDefault");
-    if (key1.isOk()) {
-      const cmd1 = key1.value.command("myCommand");
-      if (cmd1.isOk()) {
-        cmd1.value.register();
-      }
-    }
+    const cmd1 = key1.command("myCommand");
+    cmd1.register();
 
     const buildResult = await builder.build();
 

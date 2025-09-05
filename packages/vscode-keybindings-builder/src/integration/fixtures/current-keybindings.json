@@ -1,7 +1,7 @@
 [
   {
     "key": "ctrl+p",
-    "command": "myExtension.customQuickOpen"
+    "command": "myExtension.quickOpen"
   },
   {
     "key": "ctrl+k ctrl+t",
