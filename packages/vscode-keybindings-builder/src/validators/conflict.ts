@@ -12,13 +12,25 @@ export const detectConflicts = (
 
     for (const [normalizedBuilderKey, registered] of builderKeys) {
       if (normalizedManualKey === normalizedBuilderKey) {
-        // Get builder command details
-        const builderCommand = registered.commands[0]?.name || "";
-        const builderWhen = registered.commands[0]?.when;
+        // Check against ALL commands registered for this key
+        let foundMatch = false;
+        let hasConflict = false;
         
-        // Skip if it's the exact same command and when condition (not a conflict)
-        if (manual.command === builderCommand && manual.when === builderWhen) {
-          continue;
+        for (const builderCmd of registered.commands) {
+          const builderCommand = builderCmd.name;
+          const builderWhen = builderCmd.when;
+          
+          // Skip if it's the exact same command and when condition (not a conflict)
+          if (manual.command === builderCommand && manual.when === builderWhen) {
+            foundMatch = true;
+            break;
+          }
+          
+          // If same command but different when conditions, they can coexist (not a conflict)
+          if (manual.command === builderCommand && manual.when !== builderWhen) {
+            foundMatch = true;
+            break;
+          }
         }
         
         // Skip if manual command is a disable command for a default we're clearing
@@ -26,17 +38,16 @@ export const detectConflicts = (
           continue;
         }
         
-        // If same command but different when conditions, they can coexist (not a conflict)
-        if (manual.command === builderCommand && manual.when !== builderWhen) {
-          // Different when conditions mean they operate in different contexts
+        // If we found a match (same command, same or different when), it's not a conflict
+        if (foundMatch) {
           continue;
         }
         
-        // This is a true conflict - same key, different commands or same command without compatible when conditions
+        // This is a true conflict - same key, different commands
         conflicts.push({
           key: manual.key,
           manualCommand: manual.command,
-          builderCommand,
+          builderCommand: registered.commands.map(c => c.name).join(", "),
         });
       }
     }

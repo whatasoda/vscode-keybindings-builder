@@ -261,7 +261,7 @@ describe("detectConflicts", () => {
 
     const conflicts = detectConflicts(builderKeys, manualKeybindings);
     expect(conflicts.length).toBe(1);
-    expect(conflicts[0]?.builderCommand).toBe("command1"); // Should use first command
+    expect(conflicts[0]?.builderCommand).toBe("command1, command2"); // Should show all commands
   });
 
   it("should not detect conflict for same command with different when conditions", () => {
@@ -283,5 +283,32 @@ describe("detectConflicts", () => {
     // Same command, different when conditions - still not a conflict
     const conflicts = detectConflicts(builderKeys, manualKeybindings);
     expect(conflicts.length).toBe(0);
+  });
+
+  it("should handle multiple commands with same key correctly", () => {
+    const builderKeys = new Map<string, RegisteredKey>([
+      [
+        "ctrl+l+shift", // normalized form of ctrl+shift+l
+        {
+          key: "ctrl+shift+l",
+          mode: "clearDefault",
+          commands: [
+            { name: "editor.action.rename", when: "editorTextFocus" },
+            { name: "renameFile", when: "filesExplorerFocus" }
+          ],
+        },
+      ],
+    ]);
+
+    // Test with manual keybindings that match one of the commands
+    const manualKeybindings: VSCodeKeybinding[] = [
+      { key: "ctrl+shift+l", command: "editor.action.rename", when: "editorTextFocus" }, // Matches first
+      { key: "ctrl+shift+l", command: "renameFile", when: "filesExplorerFocus" }, // Matches second
+      { key: "ctrl+shift+l", command: "differentCommand", when: "terminalFocus" }, // Different command
+    ];
+
+    const conflicts = detectConflicts(builderKeys, manualKeybindings);
+    expect(conflicts.length).toBe(1); // Only the differentCommand should conflict
+    expect(conflicts[0]?.manualCommand).toBe("differentCommand");
   });
 });
