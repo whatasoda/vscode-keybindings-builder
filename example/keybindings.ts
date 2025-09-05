@@ -1,62 +1,66 @@
 import { createBuilder } from "vscode-keybindings-builder";
 
-const builderResult = createBuilder({
+const builder = createBuilder({
   dirname: import.meta.dirname,
-  // currentKeybindingPath: "",
   currentKeybindingPath: `${process.env.HOME}/Library/Application Support/Cursor/User/keybindings.json`,
 });
 
-// createBuilder now directly returns the builder (not a Result)
-const builder = builderResult;
-
 const plus_minus = () => {
-  const k1 = builder.key("cmd+=", "clearDefault").command("workbench.action.zoomIn");
-  k1.register();
+  builder
+    .key("cmd+=", "clearDefault")
+    .command("workbench.action.zoomIn")
+    .register();
 
-  const k2 = builder.key("cmd+-", "clearDefault").command("workbench.action.zoomOut");
-  k2.register();
+  builder
+    .key("cmd+-", "clearDefault")
+    .command("workbench.action.zoomOut")
+    .register();
 
-  const k3 = builder.key("cmd+shift+=", "clearDefault").command("workbench.action.minimizeOtherEditors");
-  k3.register();
+  builder
+    .key("cmd+shift+=", "clearDefault")
+    .command("workbench.action.minimizeOtherEditors")
+    .register();
 
-  const k4 = builder.key("cmd+shift+-", "clearDefault").command("workbench.action.evenEditorWidths");
-  k4.register();
+  builder
+    .key("cmd+shift+-", "clearDefault")
+    .command("workbench.action.evenEditorWidths")
+    .register();
 };
 
 const registerTextManipulation = () => {
-  const k1 = builder
+  builder
     .key("ctrl+shift+cmd+l", "clearDefault")
     .command("editor.action.rename", {
       when: "editorHasRenameProvider && editorTextFocus && !editorReadonly",
     })
     .command("renameFile", {
       when: "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus",
-    });
-  k1.register();
+    })
+    .register();
 
-  const k2 = builder
+  builder
     .key("ctrl+shift+l", "clearDefault")
     .command("workbench.action.changeLanguageMode", {
       when: "editorHasRenameProvider && editorTextFocus && !editorReadonly",
-    });
-  k2.register();
+    })
+    .register();
 
-  const k3 = builder
+  builder
     .key("cmd+ctrl+up", "clearDefault")
-    .command("editor.action.moveLinesUpAction", { when: "editorTextFocus" });
-  k3.register();
+    .command("editor.action.moveLinesUpAction", { when: "editorTextFocus" })
+    .register();
 
-  const k4 = builder
+  builder
     .key("cmd+ctrl+down", "clearDefault")
-    .command("editor.action.moveLinesDownAction", { when: "editorTextFocus" });
-  k4.register();
+    .command("editor.action.moveLinesDownAction", { when: "editorTextFocus" })
+    .register();
 };
 
 const registerQuickOpen = () => {
-  const k = builder
+  builder
     .key("cmd+t", "clearDefault")
-    .command("workbench.action.quickOpen");
-  k.register();
+    .command("workbench.action.quickOpen")
+    .register();
 };
 
 const registerWordNavigation = () => {
@@ -149,7 +153,6 @@ const registerDeleteOperations = () => {
 };
 
 const registerEmmet = () => {
-  // Just clear the default without adding a new command
   builder.key("cmd+e", "clearDefault").register();
 };
 
