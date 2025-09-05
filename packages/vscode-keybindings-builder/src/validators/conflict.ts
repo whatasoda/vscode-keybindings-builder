@@ -12,11 +12,12 @@ export const detectConflicts = (
 
     for (const [normalizedBuilderKey, registered] of builderKeys) {
       if (normalizedManualKey === normalizedBuilderKey) {
-        // Check if commands are different (true conflict)
+        // Get builder command details
         const builderCommand = registered.commands[0]?.name || "";
+        const builderWhen = registered.commands[0]?.when;
         
-        // Skip if it's the exact same command (not a conflict)
-        if (manual.command === builderCommand) {
+        // Skip if it's the exact same command and when condition (not a conflict)
+        if (manual.command === builderCommand && manual.when === builderWhen) {
           continue;
         }
         
@@ -25,7 +26,13 @@ export const detectConflicts = (
           continue;
         }
         
-        // This is a true conflict - same key, different commands
+        // If same command but different when conditions, they can coexist (not a conflict)
+        if (manual.command === builderCommand && manual.when !== builderWhen) {
+          // Different when conditions mean they operate in different contexts
+          continue;
+        }
+        
+        // This is a true conflict - same key, different commands or same command without compatible when conditions
         conflicts.push({
           key: manual.key,
           manualCommand: manual.command,

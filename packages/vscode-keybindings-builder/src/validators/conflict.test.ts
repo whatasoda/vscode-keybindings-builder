@@ -3,6 +3,82 @@ import type { RegisteredKey, VSCodeKeybinding } from "../types";
 import { detectConflicts } from "./conflict";
 
 describe("detectConflicts", () => {
+  it("should not conflict when same command has different when conditions", () => {
+    const builderKeys = new Map<string, RegisteredKey>([
+      [
+        "a+ctrl", // Normalized form of ctrl+a
+        {
+          key: "ctrl+a",
+          mode: "clearDefault",
+          commands: [{ name: "selectAll", when: "editorTextFocus" }],
+        },
+      ],
+    ]);
+
+    const manualKeybindings: VSCodeKeybinding[] = [
+      { key: "ctrl+a", command: "selectAll", when: "terminalFocus" }, // Same command, different when
+      { key: "ctrl+a", command: "selectAll", when: "editorTextFocus" }, // Same command, same when
+      { key: "ctrl+a", command: "selectAll" }, // Same command, no when condition
+    ];
+
+    const conflicts = detectConflicts(builderKeys, manualKeybindings);
+    // Should have no conflicts because different when conditions allow coexistence
+    expect(conflicts.length).toBe(0);
+  });
+
+  it("should conflict when different commands regardless of when conditions", () => {
+    const builderKeys = new Map<string, RegisteredKey>([
+      [
+        "a+ctrl",
+        {
+          key: "ctrl+a",
+          mode: "clearDefault",
+          commands: [{ name: "selectAll", when: "editorTextFocus" }],
+        },
+      ],
+    ]);
+
+    const manualKeybindings: VSCodeKeybinding[] = [
+      { key: "ctrl+a", command: "differentCommand", when: "editorTextFocus" }, // Different command, same when
+      { key: "ctrl+a", command: "differentCommand", when: "terminalFocus" }, // Different command, different when
+    ];
+
+    const conflicts = detectConflicts(builderKeys, manualKeybindings);
+    // Should have conflicts because commands are different
+    expect(conflicts.length).toBe(2);
+  });
+
+  it("should handle undefined when conditions correctly", () => {
+    const builderKeys = new Map<string, RegisteredKey>([
+      [
+        "a+ctrl",
+        {
+          key: "ctrl+a", 
+          mode: "clearDefault",
+          commands: [{ name: "selectAll" }], // No when condition
+        },
+      ],
+      [
+        "b+ctrl",
+        {
+          key: "ctrl+b",
+          mode: "clearDefault", 
+          commands: [{ name: "boldText", when: "editorTextFocus" }],
+        },
+      ],
+    ]);
+
+    const manualKeybindings: VSCodeKeybinding[] = [
+      { key: "ctrl+a", command: "selectAll" }, // Same command, both undefined when
+      { key: "ctrl+a", command: "selectAll", when: "editorTextFocus" }, // Same command, different when
+      { key: "ctrl+b", command: "boldText" }, // Same command, builder has when, manual doesn't
+    ];
+
+    const conflicts = detectConflicts(builderKeys, manualKeybindings);
+    // No conflicts - same commands with different or compatible when conditions
+    expect(conflicts.length).toBe(0);
+  });
+
   it("should detect conflicts when same key has different commands", () => {
     const builderKeys = new Map<string, RegisteredKey>([
       [
