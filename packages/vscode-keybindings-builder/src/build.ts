@@ -1,6 +1,6 @@
+import * as path from "node:path";
 import { err, ok, type Result } from "neverthrow";
-import * as path from "path";
-import type { KeybindingBuilder } from "./builder";
+import type { KeybindingBuilderHost } from "./builder";
 import type { BuilderError } from "./errors";
 import { generateClearDefaultBindings } from "./generators/clearDefault";
 import { generateOverrideDefaultBindings } from "./generators/overrideDefault";
@@ -14,7 +14,7 @@ import { normalizeKey } from "./utils/normalize";
 import { detectConflicts } from "./validators/conflict";
 
 export async function buildKeybindings(
-  builder: KeybindingBuilder,
+  builder: KeybindingBuilderHost
 ): Promise<Result<BuildSuccess, BuilderError>> {
   const config = builder.getConfig();
   const registeredKeys = builder.getRegisteredKeys();
@@ -22,16 +22,13 @@ export async function buildKeybindings(
   // Load default keybindings
   const defaultKeybindingsPath = path.join(
     config.dirname,
-    config.defaultKeybindingsFile || "default-keybindings.jsonc",
+    config.defaultKeybindingsFile || "default-keybindings.jsonc"
   );
 
   const defaultResult = await loadDefaultKeybindings(defaultKeybindingsPath);
   if (defaultResult.isErr()) {
     // If default keybindings not found, we can continue with empty defaults
     if (defaultResult.error.type === "FILE_NOT_FOUND") {
-      console.warn(
-        `Default keybindings file not found at ${defaultKeybindingsPath}, continuing with empty defaults`,
-      );
     } else {
       return err(defaultResult.error);
     }
@@ -42,7 +39,9 @@ export async function buildKeybindings(
   // Load current keybindings if provided
   let currentKeybindings: VSCodeKeybinding[] = [];
   if (config.currentKeybindingPath) {
-    const currentResult = await loadCurrentKeybindings(config.currentKeybindingPath);
+    const currentResult = await loadCurrentKeybindings(
+      config.currentKeybindingPath
+    );
     if (currentResult.isErr()) {
       return err(currentResult.error);
     }
@@ -56,14 +55,27 @@ export async function buildKeybindings(
   }
 
   // Generate warnings for preserved keybindings
-  const warnings = generatePreservationWarnings(registeredKeys, currentKeybindings);
+  const warnings = generatePreservationWarnings(
+    registeredKeys,
+    currentKeybindings
+  );
 
   // Build final keybindings array (pure function)
-  const keybindings = buildKeybindingsArray(registeredKeys, defaultKeybindings, currentKeybindings);
+  const keybindings = buildKeybindingsArray(
+    registeredKeys,
+    defaultKeybindings,
+    currentKeybindings
+  );
 
   // Write output file
-  const outputPath = path.join(config.dirname, config.outputFile || "keybindings-generated.json");
-  const writeResult = await writeFileAsync(outputPath, JSON.stringify(keybindings, null, 2));
+  const outputPath = path.join(
+    config.dirname,
+    config.outputFile || "keybindings-generated.json"
+  );
+  const writeResult = await writeFileAsync(
+    outputPath,
+    JSON.stringify(keybindings, null, 2)
+  );
 
   if (writeResult.isErr()) {
     return err(writeResult.error);
@@ -79,7 +91,7 @@ export async function buildKeybindings(
 }
 
 async function loadDefaultKeybindings(
-  filePath: string,
+  filePath: string
 ): Promise<Result<VSCodeKeybinding[], BuilderError>> {
   const contentResult = await readFileAsync(filePath);
   if (contentResult.isErr()) {
@@ -103,7 +115,7 @@ async function loadDefaultKeybindings(
 }
 
 async function loadCurrentKeybindings(
-  filePath: string,
+  filePath: string
 ): Promise<Result<VSCodeKeybinding[], BuilderError>> {
   const contentResult = await readFileAsync(filePath);
   if (contentResult.isErr()) {
@@ -128,7 +140,7 @@ async function loadCurrentKeybindings(
 
 function generatePreservationWarnings(
   registeredKeys: Map<string, RegisteredKey>,
-  currentKeybindings: VSCodeKeybinding[],
+  currentKeybindings: VSCodeKeybinding[]
 ): string[] {
   const warnings: string[] = [];
   const builderKeys = new Set(Array.from(registeredKeys.keys()));
@@ -146,7 +158,7 @@ function generatePreservationWarnings(
 function buildKeybindingsArray(
   registeredKeys: Map<string, RegisteredKey>,
   defaultKeybindings: VSCodeKeybinding[],
-  manualKeybindings: VSCodeKeybinding[],
+  manualKeybindings: VSCodeKeybinding[]
 ): VSCodeKeybinding[] {
   const result: VSCodeKeybinding[] = [];
 
@@ -159,24 +171,41 @@ function buildKeybindingsArray(
     switch (registered.mode) {
       case "clearDefault":
         result.push(
-          ...generateClearDefaultBindings(registered.key, defaultCommands, registered.commands),
+          ...generateClearDefaultBindings(
+            registered.key,
+            defaultCommands,
+            registered.commands
+          )
         );
         break;
       case "preserveDefault":
-        result.push(...generatePreserveDefaultBindings(registered.key, registered.commands));
+        result.push(
+          ...generatePreserveDefaultBindings(
+            registered.key,
+            registered.commands
+          )
+        );
         break;
       case "overrideDefault":
         result.push(
-          ...generateOverrideDefaultBindings(registered.key, defaultCommands, registered.commands),
+          ...generateOverrideDefaultBindings(
+            registered.key,
+            defaultCommands,
+            registered.commands
+          )
         );
         break;
     }
   }
 
   // Add preserved manual keybindings
-  const builderKeys = new Set(Array.from(registeredKeys.values()).map((r) => normalizeKey(r.key)));
+  const builderKeys = new Set(
+    Array.from(registeredKeys.values()).map((r) => normalizeKey(r.key))
+  );
 
-  const preserved = manualKeybindings.filter((kb) => !builderKeys.has(normalizeKey(kb.key)));
+  const preserved = manualKeybindings.filter(
+    (kb) => !builderKeys.has(normalizeKey(kb.key))
+  );
 
   return [...result, ...preserved];
 }

@@ -1,89 +1,93 @@
 import { err, ok, type Result } from "neverthrow";
 import { buildKeybindings } from "./build";
 import type { BuilderError } from "./errors";
-import type { BuilderConfig, BuildSuccess, Command, KeyHandlingMode, RegisteredKey } from "./types";
+import type {
+  BuilderConfig,
+  BuildSuccess,
+  Command,
+  KeyHandlingMode,
+  RegisteredKey,
+} from "./types";
 import { normalizeKey } from "./utils/normalize";
 import { validateKeyFormat } from "./validators/key";
 
-export interface KeybindingBuilder {
-  key(combination: string, mode: KeyHandlingMode): Result<KeybindingBuilder, BuilderError>;
-  command(
-    name: string,
-    options?: { when?: string; args?: unknown },
-  ): Result<KeybindingBuilder, BuilderError>;
-  register(): Result<KeybindingBuilder, BuilderError>;
+export interface KeybindingBuilderHost {
+  key(combination: string, mode: KeyHandlingMode): KeybindingBuilder;
   build(): Promise<Result<BuildSuccess, BuilderError>>;
   getRegisteredKeys(): Map<string, RegisteredKey>;
   getConfig(): BuilderConfig;
 }
 
-export function createKeybindingsBuilder(config: BuilderConfig): KeybindingBuilder {
-  // Private state encapsulated in closure
-  let currentKey: string | null = null;
-  let currentMode: KeyHandlingMode | null = null;
-  let currentCommands: Command[] = [];
-  const registeredKeys = new Map<string, RegisteredKey>();
+export interface KeybindingBuilder {
+  command(
+    name: string,
+    options?: { when?: string; args?: unknown }
+  ): KeybindingBuilder;
+  register(): Result<null, BuilderError>;
+}
 
-  // Pure function for validation
-  const validateAndNormalizeKey = (key: string): Result<string, BuilderError> => {
-    const validation = validateKeyFormat(key);
-    if (validation.isErr()) {
-      return err(validation.error);
-    }
-    return ok(normalizeKey(key));
-  };
+// Pure function for validation
+const validateAndNormalizeKey = (key: string): Result<string, BuilderError> => {
+  const validation = validateKeyFormat(key);
+  if (validation.isErr()) {
+    return err(validation.error);
+  }
+  return ok(normalizeKey(key));
+};
 
-  // Builder API with fluent interface
+export function createKeybindingsBuilderForKey(
+  key: string,
+  mode: KeyHandlingMode,
+  registeredKeys: Map<string, RegisteredKey>
+): KeybindingBuilder {
+  const currentCommands: Command[] = [];
+
   const builder: KeybindingBuilder = {
-    key(combination: string, mode: KeyHandlingMode): Result<KeybindingBuilder, BuilderError> {
-      const normalized = validateAndNormalizeKey(combination);
+    command(
+      name: string,
+      options?: { when?: string; args?: unknown }
+    ): KeybindingBuilder {
+      currentCommands.push({ name, ...options });
+      return builder;
+    },
+    register(): Result<null, BuilderError> {
+      const normalized = validateAndNormalizeKey(key);
       if (normalized.isErr()) {
         return err(normalized.error);
       }
 
-      currentKey = combination;
-      currentMode = mode;
-      currentCommands = [];
-      return ok(builder);
-    },
-
-    command(
-      name: string,
-      options?: { when?: string; args?: unknown },
-    ): Result<KeybindingBuilder, BuilderError> {
-      if (!currentKey) {
-        return err({ type: "NO_KEY_ACTIVE", operation: "command" } as const);
-      }
-
-      currentCommands.push({ name, ...options });
-      return ok(builder);
-    },
-
-    register(): Result<KeybindingBuilder, BuilderError> {
-      if (!currentKey || !currentMode) {
-        return err({ type: "NO_KEY_ACTIVE", operation: "register" } as const);
-      }
-
-      const normalized = normalizeKey(currentKey);
-      if (registeredKeys.has(normalized)) {
+      if (registeredKeys.has(normalized.value)) {
         return err({
           type: "DUPLICATE_KEY",
-          key: currentKey,
-          existingIndex: Array.from(registeredKeys.keys()).indexOf(normalized),
+          key,
+          existingIndex: Array.from(registeredKeys.keys()).indexOf(
+            normalized.value
+          ),
         } as const);
       }
 
-      registeredKeys.set(normalized, {
-        key: currentKey,
-        mode: currentMode,
+      registeredKeys.set(normalized.value, {
+        key,
+        mode,
         commands: [...currentCommands],
       });
 
-      // Clear current state
-      currentKey = null;
-      currentMode = null;
-      currentCommands = [];
-      return ok(builder);
+      return ok(null);
+    },
+  };
+
+  return builder;
+}
+
+export function createKeybindingsBuilder(
+  config: BuilderConfig
+): KeybindingBuilderHost {
+  const registeredKeys = new Map<string, RegisteredKey>();
+
+  // Builder API with fluent interface
+  const builder: KeybindingBuilderHost = {
+    key(combination: string, mode: KeyHandlingMode): KeybindingBuilder {
+      return createKeybindingsBuilderForKey(combination, mode, registeredKeys);
     },
 
     async build(): Promise<Result<BuildSuccess, BuilderError>> {

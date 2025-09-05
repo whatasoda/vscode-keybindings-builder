@@ -1,8 +1,14 @@
-import { createKeybindingsBuilder, type KeybindingBuilder } from "./builder";
+import type z from "zod";
+import {
+  createKeybindingsBuilder,
+  type KeybindingBuilderHost,
+} from "./builder";
 import { BuilderConfigSchema } from "./schemas";
 import type { BuilderConfig } from "./types";
 
-export function createBuilder(config: unknown): KeybindingBuilder {
+export function createBuilder(
+  config: z.input<typeof BuilderConfigSchema>
+): KeybindingBuilderHost {
   const validation = BuilderConfigSchema.safeParse(config);
 
   if (!validation.success) {
@@ -16,7 +22,7 @@ export function createBuilder(config: unknown): KeybindingBuilder {
 }
 
 // Export types for consumers
-export type { KeybindingBuilder } from "./builder";
+export type { KeybindingBuilderHost as KeybindingBuilder } from "./builder";
 export type { BuilderError } from "./errors";
 export type {
   BuilderConfig,
