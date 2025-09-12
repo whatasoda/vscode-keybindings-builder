@@ -128,7 +128,7 @@ const registerSelection = () => {
 
 const registerCodeNavigation = () => {
   builder
-    .key("ctrl+enter", "clearDefault")
+    .key("ctrl+enter", "preserveDefault")
     .command("editor.action.goToDeclaration", {
       when: "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor",
     })
@@ -152,8 +152,18 @@ const registerDeleteOperations = () => {
     .register();
 };
 
-const registerEmmet = () => {
+const disable = () => {
   builder.key("cmd+e", "clearDefault").register();
+
+  builder
+    .key("tab", "preserveDefault")
+    .command("-editor.action.acceptCursorTabSuggestion", {
+      when: "cpp.shouldAcceptTab",
+    })
+    .command("-editor.emmet.action.expandAbbreviation", {
+      when: "config.emmet.triggerExpansionOnTab && editorTextFocus && !editorReadonly && !editorTabMovesFocus",
+    })
+    .register();
 };
 
 const registerExplorer = () => {
@@ -170,9 +180,12 @@ const registerExplorer = () => {
     .register();
 
   builder
-    .key("ctrl+space", "clearDefault")
+    .key("ctrl+space", "preserveDefault")
     .command("explorer.openAndPassFocus", {
       when: "filesExplorerFocus && foldersViewVisible && !explorerResourceIsFolder && !inputFocus",
+    })
+    .command("revealReference", {
+      when: "listFocus && referenceSearchVisible && !inputFocus && !treeElementCanCollapse && !treeElementCanExpand && !treestickyScrollFocused",
     })
     .register();
 };
@@ -219,7 +232,9 @@ const registerGit = () => {
 
 const registerIntelliSense = () => {
   builder
-    .key("cmd+enter", "clearDefault")
+    .key("cmd+enter", "preserveDefault")
+    .command("-editor.action.insertLineAfter")
+    .command("-previewSelectedCodeAction")
     .command("editor.action.acceptCursorTabSuggestion", {
       when: "cpp.shouldAcceptTab && !searchViewletFocus",
     })
@@ -290,15 +305,6 @@ const registerCopyPath = () => {
     .register();
 };
 
-const registerReferences = () => {
-  builder
-    .key("ctrl+space", "preserveDefault")
-    .command("revealReference", {
-      when: "listFocus && referenceSearchVisible && !inputFocus && !treeElementCanCollapse && !treeElementCanExpand && !treestickyScrollFocused",
-    })
-    .register();
-};
-
 // Register all keybindings
 plus_minus();
 registerTextManipulation();
@@ -307,7 +313,7 @@ registerWordNavigation();
 registerSelection();
 registerCodeNavigation();
 registerDeleteOperations();
-registerEmmet();
+disable();
 registerExplorer();
 registerSettings();
 registerNavigation();
@@ -316,7 +322,6 @@ registerIntelliSense();
 registerSmartSelect();
 registerWindowManagement();
 registerCopyPath();
-registerReferences();
 
 // Build
 builder.build().then((result) => {
