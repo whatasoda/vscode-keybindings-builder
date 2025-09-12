@@ -33,9 +33,9 @@ cd example && bun run build
 
 ## Project Structure
 
-- **packages/vscode-keyboard-builder**: Main library package containing the builder API
+- **packages/vscode-keybindings-builder**: Main library package containing the builder API
 - **example/**: Example usage of the keybindings builder
-- **Workspace configuration**: Uses Bun workspaces with packages/* and example directories
+- **Workspace configuration**: Uses Bun workspaces with packages/\* and example directories
 
 ## Code Architecture
 
@@ -46,6 +46,7 @@ The library provides a builder pattern API for constructing VSCode keybindings:
 3. **Build Output**: `.build()` generates the final keybindings configuration
 
 Key builder methods:
+
 - `.key(binding, mode)`: Define key combination and handling mode
 - `.command(name, options)`: Attach VSCode command with optional conditions
 - `.register()`: Finalize a keybinding entry

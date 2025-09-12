@@ -1,0 +1,14 @@
+[
+  {
+    "key": "ctrl+p",
+    "command": "myExtension.quickOpen"
+  },
+  {
+    "key": "ctrl+k ctrl+t",
+    "command": "workbench.action.selectTheme"
+  },
+  {
+    "key": "alt+shift+f",
+    "command": "editor.action.formatDocument"
+  }
+]
