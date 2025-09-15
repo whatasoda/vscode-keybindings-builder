@@ -1,13 +1,7 @@
 import { err, ok, type Result } from "neverthrow";
 import { buildKeybindings } from "./build";
 import type { BuilderError } from "./errors";
-import type {
-  BuilderConfig,
-  BuildSuccess,
-  Command,
-  KeyHandlingMode,
-  RegisteredKey,
-} from "./types";
+import type { BuilderConfig, BuildSuccess, Command, KeyHandlingMode, RegisteredKey } from "./types";
 import { normalizeKey } from "./utils/normalize";
 import { validateKeyFormat } from "./validators/key";
 
@@ -19,10 +13,7 @@ export interface KeybindingBuilderHost {
 }
 
 export interface KeybindingBuilder {
-  command(
-    name: string,
-    options?: { when?: string; args?: unknown }
-  ): KeybindingBuilder;
+  command(name: string, options?: { when?: string; args?: unknown }): KeybindingBuilder;
   register(): Result<null, BuilderError>;
 }
 
@@ -38,15 +29,12 @@ const validateAndNormalizeKey = (key: string): Result<string, BuilderError> => {
 export function createKeybindingsBuilderForKey(
   key: string,
   mode: KeyHandlingMode,
-  registeredKeys: Map<string, RegisteredKey>
+  registeredKeys: Map<string, RegisteredKey>,
 ): KeybindingBuilder {
   const currentCommands: Command[] = [];
 
   const builder: KeybindingBuilder = {
-    command(
-      name: string,
-      options?: { when?: string; args?: unknown }
-    ): KeybindingBuilder {
+    command(name: string, options?: { when?: string; args?: unknown }): KeybindingBuilder {
       currentCommands.push({ name, ...options });
       return builder;
     },
@@ -60,9 +48,7 @@ export function createKeybindingsBuilderForKey(
         return err({
           type: "DUPLICATE_KEY",
           key,
-          existingIndex: Array.from(registeredKeys.keys()).indexOf(
-            normalized.value
-          ),
+          existingIndex: Array.from(registeredKeys.keys()).indexOf(normalized.value),
         } as const);
       }
 
@@ -79,9 +65,7 @@ export function createKeybindingsBuilderForKey(
   return builder;
 }
 
-export function createKeybindingsBuilder(
-  config: BuilderConfig
-): KeybindingBuilderHost {
+export function createKeybindingsBuilder(config: BuilderConfig): KeybindingBuilderHost {
   const registeredKeys = new Map<string, RegisteredKey>();
 
   // Builder API with fluent interface

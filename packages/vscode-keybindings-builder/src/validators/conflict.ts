@@ -3,7 +3,7 @@ import { normalizeKey } from "../utils/normalize";
 
 export const detectConflicts = (
   builderKeys: Map<string, RegisteredKey>,
-  manualKeybindings: VSCodeKeybinding[]
+  manualKeybindings: VSCodeKeybinding[],
 ): ConflictInfo[] => {
   const conflicts: ConflictInfo[] = [];
 
@@ -20,29 +20,20 @@ export const detectConflicts = (
           const builderWhen = builderCmd.when;
 
           // Skip if it's the exact same command and when condition (not a conflict)
-          if (
-            manual.command === builderCommand &&
-            manual.when === builderWhen
-          ) {
+          if (manual.command === builderCommand && manual.when === builderWhen) {
             foundMatch = true;
             break;
           }
 
           // If same command but different when conditions, they can coexist (not a conflict)
-          if (
-            manual.command === builderCommand &&
-            manual.when !== builderWhen
-          ) {
+          if (manual.command === builderCommand && manual.when !== builderWhen) {
             foundMatch = true;
             break;
           }
         }
 
         // Skip if manual command is a disable command for a default we're clearing
-        if (
-          registered.mode === "clearDefault" &&
-          manual.command.startsWith("-")
-        ) {
+        if (registered.mode === "clearDefault" && manual.command.startsWith("-")) {
           continue;
         }
 
@@ -52,10 +43,19 @@ export const detectConflicts = (
         }
 
         // This is a true conflict - same key, different commands
+        // Include when conditions in the conflict info for better clarity
+        const builderCommandsWithWhen = registered.commands
+          .map((c) => (c.when ? `${c.name} (when: ${c.when})` : c.name))
+          .join(", ");
+
+        const manualCommandWithWhen = manual.when
+          ? `${manual.command} (when: ${manual.when})`
+          : manual.command;
+
         conflicts.push({
           key: manual.key,
-          manualCommand: manual.command,
-          builderCommand: registered.commands.map((c) => c.name).join(", "),
+          manualCommand: manualCommandWithWhen,
+          builderCommand: builderCommandsWithWhen,
         });
       }
     }

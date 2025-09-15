@@ -21,7 +21,7 @@ describe("KeybindingBuilder.key()", () => {
     const builder = createKeybindingsBuilder(config);
     const keyBuilder = builder.key("ctrl+shift+p", "preserveDefault");
     expect(keyBuilder).toBeDefined();
-    
+
     const afterCommand = keyBuilder.command("test");
     expect(afterCommand).toBe(keyBuilder); // Should return same instance for chaining
   });
@@ -31,7 +31,7 @@ describe("KeybindingBuilder.key()", () => {
     // Invalid key should still return a builder
     const keyBuilder = builder.key("invalid++key", "clearDefault");
     expect(keyBuilder).toBeDefined();
-    
+
     // But register should fail
     const result = keyBuilder.register();
     expect(result.isErr()).toBe(true);
@@ -99,7 +99,7 @@ describe("KeybindingBuilder.command()", () => {
     const keyBuilder = builder.key("ctrl+p", "clearDefault");
     const afterCommand = keyBuilder.command("workbench.action.quickOpen");
     expect(afterCommand).toBe(keyBuilder); // Should return same instance
-    
+
     const result = afterCommand.register();
     expect(result.isOk()).toBe(true);
   });
@@ -110,7 +110,7 @@ describe("KeybindingBuilder.command()", () => {
     const afterCommand = keyBuilder.command("workbench.action.quickOpen", {
       when: "editorTextFocus",
     });
-    
+
     const result = afterCommand.register();
     expect(result.isOk()).toBe(true);
   });
@@ -146,7 +146,7 @@ describe("KeybindingBuilder.command()", () => {
     const afterCommand = keyBuilder.command("editor.action.startFindReplaceAction", {
       args: { query: "hello", replace: "world" },
     });
-    
+
     const result = afterCommand.register();
     expect(result.isOk()).toBe(true);
   });

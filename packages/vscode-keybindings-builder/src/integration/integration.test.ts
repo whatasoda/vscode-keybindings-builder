@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import * as fs from "fs";
+import { existsSync } from "fs";
 import * as os from "os";
 import * as path from "path";
 import { createBuilder } from "../index";
@@ -110,7 +111,7 @@ describe("End-to-end integration", () => {
     }
   });
 
-  it("should fail on conflicts when same key has different commands", async () => {
+  it("should generate output with warnings when same key has different commands", async () => {
     const builder = createBuilder({
       dirname: tempDir,
       currentKeybindingPath: path.join(tempDir, "current-keybindings.json"),
@@ -125,14 +126,21 @@ describe("End-to-end integration", () => {
     expect(result1.isOk()).toBe(true);
 
     const buildResult = await builder.build();
-    expect(buildResult.isErr()).toBe(true);
+    expect(buildResult.isOk()).toBe(true);
 
-    if (buildResult.isErr()) {
-      expect(buildResult.error.type).toBe("CONFLICT_DETECTED");
-      if (buildResult.error.type === "CONFLICT_DETECTED") {
-        expect(buildResult.error.conflicts.length).toBe(1);
-        expect(buildResult.error.conflicts[0]!.key).toBe("ctrl+p");
-      }
+    if (buildResult.isOk()) {
+      // Check that warnings contain the conflict
+      expect(buildResult.value.warnings.length).toBeGreaterThan(0);
+      const conflictWarning = buildResult.value.warnings.find((w) =>
+        w.includes("Conflict detected"),
+      );
+      expect(conflictWarning).toBeDefined();
+      expect(conflictWarning).toContain("ctrl+p");
+
+      // Check that output file was still generated
+      const outputPath = path.join(tempDir, "output.json");
+      const outputExists = existsSync(outputPath);
+      expect(outputExists).toBe(true);
     }
   });
 

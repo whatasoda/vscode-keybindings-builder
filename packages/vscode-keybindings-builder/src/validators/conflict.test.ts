@@ -53,7 +53,7 @@ describe("detectConflicts", () => {
       [
         "a+ctrl",
         {
-          key: "ctrl+a", 
+          key: "ctrl+a",
           mode: "clearDefault",
           commands: [{ name: "selectAll" }], // No when condition
         },
@@ -62,7 +62,7 @@ describe("detectConflicts", () => {
         "b+ctrl",
         {
           key: "ctrl+b",
-          mode: "clearDefault", 
+          mode: "clearDefault",
           commands: [{ name: "boldText", when: "editorTextFocus" }],
         },
       ],
@@ -235,10 +235,7 @@ describe("detectConflicts", () => {
     const conflicts = detectConflicts(emptyBuilderKeys, emptyManualKeybindings);
     expect(conflicts.length).toBe(0);
 
-    const conflicts2 = detectConflicts(
-      emptyBuilderKeys,
-      [{ key: "ctrl+a", command: "test" }],
-    );
+    const conflicts2 = detectConflicts(emptyBuilderKeys, [{ key: "ctrl+a", command: "test" }]);
     expect(conflicts2.length).toBe(0);
   });
 
@@ -249,10 +246,7 @@ describe("detectConflicts", () => {
         {
           key: "ctrl+p",
           mode: "preserveDefault",
-          commands: [
-            { name: "command1" },
-            { name: "command2", when: "condition" },
-          ],
+          commands: [{ name: "command1" }, { name: "command2", when: "condition" }],
         },
       ],
     ]);
@@ -261,7 +255,7 @@ describe("detectConflicts", () => {
 
     const conflicts = detectConflicts(builderKeys, manualKeybindings);
     expect(conflicts.length).toBe(1);
-    expect(conflicts[0]?.builderCommand).toBe("command1, command2"); // Should show all commands
+    expect(conflicts[0]?.builderCommand).toBe("command1, command2 (when: condition)"); // Should show all commands with when conditions
   });
 
   it("should not detect conflict for same command with different when conditions", () => {
@@ -294,7 +288,7 @@ describe("detectConflicts", () => {
           mode: "clearDefault",
           commands: [
             { name: "editor.action.rename", when: "editorTextFocus" },
-            { name: "renameFile", when: "filesExplorerFocus" }
+            { name: "renameFile", when: "filesExplorerFocus" },
           ],
         },
       ],
@@ -309,6 +303,6 @@ describe("detectConflicts", () => {
 
     const conflicts = detectConflicts(builderKeys, manualKeybindings);
     expect(conflicts.length).toBe(1); // Only the differentCommand should conflict
-    expect(conflicts[0]?.manualCommand).toBe("differentCommand");
+    expect(conflicts[0]?.manualCommand).toBe("differentCommand (when: terminalFocus)");
   });
 });

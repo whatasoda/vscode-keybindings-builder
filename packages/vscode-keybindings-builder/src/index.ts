@@ -1,14 +1,9 @@
 import type z from "zod";
-import {
-  createKeybindingsBuilder,
-  type KeybindingBuilderHost,
-} from "./builder";
+import { createKeybindingsBuilder, type KeybindingBuilderHost } from "./builder";
 import { BuilderConfigSchema } from "./schemas";
 import type { BuilderConfig } from "./types";
 
-export function createBuilder(
-  config: z.input<typeof BuilderConfigSchema>
-): KeybindingBuilderHost {
+export function createBuilder(config: z.input<typeof BuilderConfigSchema>): KeybindingBuilderHost {
   const validation = BuilderConfigSchema.safeParse(config);
 
   if (!validation.success) {

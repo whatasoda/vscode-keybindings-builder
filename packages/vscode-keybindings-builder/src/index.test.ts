@@ -20,7 +20,7 @@ describe("createBuilder", () => {
     expect(() => createBuilder({} as any)).toThrow("process.exit called");
     expect(exitSpy).toHaveBeenCalledWith(1);
     expect(consoleSpy).toHaveBeenCalled();
-    
+
     exitSpy.mockRestore();
     consoleSpy.mockRestore();
   });
@@ -53,11 +53,11 @@ describe("createBuilder", () => {
     expect(() =>
       createBuilder({
         dirname: 123 as any, // Should be string
-      })
+      }),
     ).toThrow("process.exit called");
     expect(exitSpy).toHaveBeenCalledWith(1);
     expect(consoleSpy).toHaveBeenCalled();
-    
+
     exitSpy.mockRestore();
     consoleSpy.mockRestore();
   });
