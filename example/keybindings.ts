@@ -40,7 +40,7 @@ const registerTextManipulation = () => {
 
   builder
     .key("ctrl+shift+l", "clearDefault")
-    .command("workbench.action.changeLanguageMode", {
+    .command("workbench.action.editor.changeLanguageMode", {
       when: "editorHasRenameProvider && editorTextFocus && !editorReadonly",
     })
     .register();
@@ -264,8 +264,8 @@ const registerWindowManagement = () => {
     })
     .register();
 
-  const right = ["ctrl+'", "ctrl+alt+'", "ctrl+right"];
-  const left = ["ctrl+l", "ctrl+alt+l", "ctrl+left"];
+  const right = ["ctrl+'", "ctrl+alt+'"];
+  const left = ["ctrl+l", "ctrl+alt+l"];
 
   for (const key of right) {
     builder
